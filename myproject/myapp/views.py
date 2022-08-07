@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
 from .models import Movie
+from .models import Review
 from .serializers import MovieListSerializer
 
 @api_view(['GET','POST'])
@@ -45,3 +46,38 @@ def movie_detail_update_delete(request,movie_pk):
             'movie':movie_pk
         }
         return Response(data)
+
+@api_view(['GET','POST'])
+def review_create(request, id):
+    if request.method == "POST":
+        review= get_object_or_404(Movie,pk=review_pk)
+        serializer = MovieListSerializer(movie)
+        post = get_object_or_404(Post, pk=id)
+        current_user = request.user
+        comment_content = request.POST.get("content")
+        if len(comment_content.strip()) != 0:
+            Comment.objects.create(content=comment_content,
+                                   writer=current_user, post=post)
+    return Response(serializer.data)
+
+
+def review_edit(request, id):
+    comment = Comment.objects.get(id=id)
+    if request.user == comment.writer:
+        return render(request, "main/comment_edit.html", {"comment": comment})
+    else:
+        return Response("main:detail", comment.post.id)
+
+
+def review_delete(request, id):
+    comment = Comment.objects.get(id=id)
+    if request.user == comment.writer:
+        comment.delete()
+    return Response("main:detail", comment.post.id)
+
+
+def review_update(request, id):
+    comment = Comment.objects.get(id=id)
+    comment.content = request.POST.get("content")
+    comment.save()
+    return Response("main:detail", comment.post.id)
