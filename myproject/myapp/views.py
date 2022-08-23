@@ -4,7 +4,7 @@ from rest_framework.permissions import AllowAny
 from django.shortcuts import render, get_object_or_404
 
 from .models import Movie, Review
-from .serializers import MovieListSerializer, ReviewListSerializer
+from .serializers import MovieListSerializer, ReviewListSerializer,UserSerializer
 
 from django.contrib.auth import authenticate
 import jwt
